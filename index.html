@@ -693,11 +693,14 @@
   // ── Parse date from gviz (Date object) or string ──
   function parseDate(val) {
     if (!val) return null;
-    if (typeof val === 'string') return new Date(val);
-    // gviz returns Date(year, month, day, ...) as string like "Date(2024,4,7,...)"
-    const m = String(val).match(/Date\((\d+),(\d+),(\d+)/);
+    const s = String(val);
+    // gviz returns dates as "Date(2024,4,7,23,22,23)" — month is 0-indexed
+    const m = s.match(/Date\((\d+),(\d+),(\d+)/);
     if (m) return new Date(+m[1], +m[2], +m[3]);
-    return new Date(val);
+    // plain string like "2024-05-07 23:22:23"
+    const d = new Date(s.replace(' ', 'T'));
+    if (!isNaN(d)) return d;
+    return null;
   }
 
   // ── Main load ──
